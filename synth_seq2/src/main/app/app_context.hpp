@@ -6,6 +6,7 @@
 
 #include "src/main/graphics/graphics_wrapper.hpp"
 #include "src/main/input_system/input_system.hpp"
+#include "src/main/sequencer/sequencer.hpp"
 #include "src/shared/messages.hpp"
 #include "src/shared/shared.hpp"
 

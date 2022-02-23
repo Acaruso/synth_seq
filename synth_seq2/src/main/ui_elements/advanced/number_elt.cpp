@@ -10,7 +10,6 @@
 Rect getInnerRect(EltParams& params)
 {
     std::string fontName = params.fontName;
-    std::string displayText = params.getDisplayText();
     Coord innerCoord;
     innerCoord.x = params.coord.x + 1;
     innerCoord.y = params.coord.y + 1;
@@ -62,7 +61,7 @@ void numberEltInner(EltParams& params)
     std::string fontName = params.fontName;
     Font& font = params.ctx.graphicsWrapper.getFont(params.fontName);
 
-    std::string displayText = params.getDisplayText();
+    std::string displayText = params.displayText;
 
     Rect innerRect = getInnerRect(params);
 

@@ -1,9 +1,44 @@
 #include "poly_fm_sin.hpp"
 
-PolyFmSin::PolyFmSin(int size)
+Operator::Operator(double secondsPerSample)
+    : secondsPerSample(secondsPerSample)
+{
+    carrier = SinWT(secondsPerSample);
+    modulator = SinWT(secondsPerSample);
+}
+
+bool Operator::isOn()
+{
+    return carrier.env.on;
+}
+
+void Operator::trigger(
+    double a,
+    double h,
+    double r,
+    double ma,
+    double mh,
+    double mr,
+    double modAmount,
+    double freq
+) {
+    this->modAmount = modAmount;
+    carrier.trigger(a, h, r, freq);
+    modulator.trigger(ma, mh, mr, freq);
+}
+
+double Operator::get(double t)
+{
+    double modSig = modulator.get(t) * modAmount * modScale;
+    double carSig = carrier.get(modSig, t);
+    return carSig;
+}
+
+PolyFmSin::PolyFmSin(int size, double secondsPerSample)
+    : secondsPerSample(secondsPerSample)
 {
     for (int i = 0; i < size; i++) {
-        oscs.push_back(Operator());
+        oscs.push_back(Operator(secondsPerSample));
     }
 }
 

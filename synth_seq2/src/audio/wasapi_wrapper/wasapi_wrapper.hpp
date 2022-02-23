@@ -3,6 +3,7 @@
 #include <Audioclient.h>
 #include <iostream>
 #include <mmdeviceapi.h>
+#include <stdint.h>
 
 class WasapiWrapper
 {
@@ -19,7 +20,10 @@ public:
     unsigned getBufferSizeBytes();
     unsigned getCurrentPadding();
     unsigned getPeriodSizeFrames();
-    void writeBuffer(unsigned long* source, unsigned numFramesToWrite);
+    void waitForSignal();
+    unsigned getNumFramesToWrite();
+    unsigned getNumSamplesToWrite();
+    void writeBuffer(uint32_t* source, unsigned numFramesToWrite);
     void startPlaying();
     void stopPlaying();
 };

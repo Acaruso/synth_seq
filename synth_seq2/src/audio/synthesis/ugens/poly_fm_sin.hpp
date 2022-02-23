@@ -6,16 +6,18 @@
 
 struct Operator
 {
-    Sin carrier;
-    Sin modulator;
-    double modAmount;
+    SinWT carrier;
+    SinWT modulator;
+
+    double secondsPerSample{0};
+    double modAmount{0};
+    double modScale{16};
 
     Operator() {}
 
-    bool isOn()
-    {
-        return carrier.env.on;
-    }
+    Operator(double secondsPerSample);
+
+    bool isOn();
 
     void trigger(
         double a,
@@ -26,25 +28,19 @@ struct Operator
         double mr,
         double modAmount,
         double freq
-    ) {
-        this->modAmount = modAmount;
-        carrier.trigger(a, h, r, freq);
-        modulator.trigger(ma, mh, mr, freq);
-    }
+    );
 
-    double get(double t)
-    {
-        double modSig = modulator.get(t) * modAmount * 4;
-        double carSig = carrier.get(modSig, t);
-        return carSig;
-    }
+    double get(double t);
 };
 
 struct PolyFmSin
 {
+    double secondsPerSample{0};
     std::vector<Operator> oscs;
 
-    PolyFmSin(int size);
+    PolyFmSin() {}
+
+    PolyFmSin(int size, double secondsPerSample);
 
     void trigger(
         double a,

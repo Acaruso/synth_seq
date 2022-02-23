@@ -1,10 +1,12 @@
 #pragma once
 
+#include <iostream>
+#include <string>
 #include <unordered_map>
 
 using SynthSettings = std::unordered_map<std::string, int>;
 
-inline SynthSettings getDefaultSynthSettings()
+inline SynthSettings makeSynthSettings()
 {
     SynthSettings synthSettings;
 
@@ -21,5 +23,30 @@ inline SynthSettings getDefaultSynthSettings()
     return synthSettings;
 }
 
-// key = sample location
-using EventMap = std::unordered_map<unsigned, SynthSettings>;
+struct Event
+{
+    unsigned sample;
+    int track;
+    SynthSettings synthSettings;
+    Event() {}
+    Event(unsigned sample, int track, SynthSettings synthSettings)
+        : sample(sample), track(track), synthSettings(synthSettings)
+    {}
+};
+
+inline std::string makeEventKey(unsigned sample, int track)
+{
+    return std::to_string(sample) + "," + std::to_string(track);
+}
+
+using EventMap = std::unordered_map<std::string, Event>;
+
+inline void printEventMap(EventMap map)
+{
+    for (auto& elt : map) {
+        auto& s = elt.second.synthSettings;
+        std::cout << "key: " << elt.first << std::endl;
+        std::cout << "note: " << s["note"] << std::endl;
+        std::cout << std::endl;
+    }
+}

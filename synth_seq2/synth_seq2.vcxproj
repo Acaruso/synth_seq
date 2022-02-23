@@ -7,7 +7,6 @@
     <ClCompile Include="src/audio/audio_util.cpp" />
     <ClCompile Include="src/audio/synthesis/audio_callback.cpp" />
     <ClCompile Include="src/audio/synthesis/ugens/ahr_env.cpp" />
-    <ClCompile Include="src/audio/synthesis/ugens/poly_sin.cpp" />
     <ClCompile Include="src/audio/synthesis/ugens/poly_fm_sin.cpp" />
     <ClCompile Include="src/audio/synthesis/ugens/sin.cpp" />
     <ClCompile Include="src/audio/synthesis/ugens/smooth.cpp" />
@@ -21,7 +20,6 @@
     <ClInclude Include="src/audio/audio_util.hpp" />
     <ClInclude Include="src/audio/synthesis/consts.hpp" />
     <ClInclude Include="src/audio/synthesis/ugens/ahr_env.hpp" />
-    <ClInclude Include="src/audio/synthesis/ugens/poly_sin.hpp" />
     <ClInclude Include="src/audio/synthesis/ugens/poly_fm_sin.hpp" />
     <ClInclude Include="src/audio/synthesis/ugens/sin.hpp" />
     <ClInclude Include="src/audio/synthesis/ugens/smooth.hpp" />
@@ -32,7 +30,6 @@
   <ItemGroup>
     <ClCompile Include="C:\cpp-libraries\SDL_FontCache-master\SDL_FontCache.c" />
     <ClCompile Include="src/main/app/app.cpp" />
-    <ClCompile Include="src/main/callback/callback.cpp" />
     <ClCompile Include="src/main/graphics/draw_commands.cpp" />
     <ClCompile Include="src/main/graphics/draw_system.cpp" />
     <ClCompile Include="src/main/graphics/graphics_wrapper.cpp" />
@@ -51,12 +48,12 @@
     <ClCompile Include="src/main/ui_elements/decorators/decorator_utils.cpp" />
     <ClCompile Include="src/main/ui_elements/decorators/draggable.cpp" />
     <ClCompile Include="src/main/ui_elements/decorators/holdable.cpp" />
+    <ClCompile Include="src/main/ui_system/ui_system.cpp" />
     <ClCompile Include="src/main/util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src/main/app/app_context.hpp" />
     <ClInclude Include="src/main/app/app.hpp" />
-    <ClInclude Include="src/main/callback/callback.hpp" />
     <ClInclude Include="src/main/graphics/color.hpp" />
     <ClInclude Include="src/main/graphics/coord.hpp" />
     <ClInclude Include="src/main/graphics/draw_commands.hpp" />
@@ -66,15 +63,17 @@
     <ClInclude Include="src/main/graphics/image.hpp" />
     <ClInclude Include="src/main/graphics/rect.hpp" />
     <ClInclude Include="src/main/input_system/input_system.hpp" />
+    <ClInclude Include="src/main/sequencer/cell.hpp" />
     <ClInclude Include="src/main/sequencer/sequencer.hpp" />
+    <ClInclude Include="src/main/sequencer/track.hpp" />
     <ClInclude Include="src/main/ui_elements/advanced/number_elt.hpp" />
     <ClInclude Include="src/main/ui_elements/advanced/number_with_label_elt.hpp" />
     <ClInclude Include="src/main/ui_elements/advanced/piano_elt.hpp" />
     <ClInclude Include="src/main/ui_elements/advanced/rect_button_elt.hpp" />
     <ClInclude Include="src/main/ui_elements/advanced/sequencer_elt.hpp" />
     <ClInclude Include="src/main/ui_elements/advanced/synth_settings_elt.hpp" />
-    <ClInclude Include="src/main/ui_elements/advanced/transport_elt.hpp" />
     <ClInclude Include="src/main/ui_elements/advanced/text_elt.hpp" />
+    <ClInclude Include="src/main/ui_elements/advanced/transport_elt.hpp" />
     <ClInclude Include="src/main/ui_elements/basic/rect_outline_elt.hpp" />
     <ClInclude Include="src/main/ui_elements/decorators/base_decorator.hpp" />
     <ClInclude Include="src/main/ui_elements/decorators/clickable.hpp" />
@@ -83,6 +82,7 @@
     <ClInclude Include="src/main/ui_elements/decorators/holdable.hpp" />
     <ClInclude Include="src/main/ui_elements/elt_params.hpp" />
     <ClInclude Include="src/main/ui_elements/ui_elements_shared.hpp" />
+    <ClInclude Include="src/main/ui_system/ui_system.hpp" />
     <ClInclude Include="src/main/util.hpp" />
   </ItemGroup>
   <!-- shared -->

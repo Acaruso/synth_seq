@@ -3,13 +3,15 @@
 #include <functional>
 #include <iostream>
 
+#include "src/main/sequencer/sequencer.hpp"
 #include "src/main/ui_elements/advanced/rect_button_elt.hpp"
+#include "src/main/ui_elements/advanced/text_elt.hpp"
+#include "src/main/util.hpp"
 
 namespace
 {
     int buttonSize = 50;
     int padding = 10;
-    int baseNote = 60;
 }
 
 Rect getWhiteKeyRect(Coord coord, int i);
@@ -31,33 +33,38 @@ void blackKey(
 
 void background(EltParams& params, Coord coord);
 
+void octaveControl(EltParams& params, Coord coord);
+
 void pianoElt(EltParams& params)
 {
     AppContext& ctx = params.ctx;
     Coord coord = params.coord;
+    Sequencer* sequencer = ctx.sequencer;
 
     background(params, coord);
+
+    octaveControl(params, Coord(coord.x + 450, coord.y));
 
     int k = 0;
 
     for (int i = 0; i < 12; i++) {
-        int note = baseNote + i;
+        int note = ((sequencer->octave + 1) * 12) + i;
 
-        std::function<void()> _onClick = nullptr;
+        std::function<void()> onClick_ = nullptr;
 
-        if (ctx.sequencer->mode == Normal) {
-            _onClick = [&]() {
-                // ctx.sequencer->curSynthSettings["note"] = note;
-                // ctx.toAudioQueue->enqueue(NoteMessage(note));
-                ctx.sequencer->curSynthSettings["note"] = note;
+        if (sequencer->getMode() == Normal) {
+            onClick_ = [&]() {
+                auto& synthSettings = sequencer->getSelectedTrack().getSynthSettings();
+                synthSettings["note"] = note;
                 ctx.toAudioQueue->enqueue(
-                    SynthSettingsMessage(ctx.sequencer->curSynthSettings)
+                    SynthSettingsMessage(synthSettings)
                 );
             };
         }
-        else if (ctx.sequencer->mode == Select) {
-            _onClick = [&]() {
-                ctx.sequencer->getSelectedCell().synthSettings["note"] = note;
+        else if (sequencer->getMode() == Select) {
+            onClick_ = [&]() {
+                auto& synthSettings = sequencer->getSelectedCell().getSynthSettings();
+                synthSettings["note"] = note;
             };
         }
 
@@ -65,7 +72,7 @@ void pianoElt(EltParams& params)
             blackKey(
                 params.ctx,
                 getBlackKeyRect(coord, i),
-                _onClick,
+                onClick_,
                 note
             );
         }
@@ -73,7 +80,7 @@ void pianoElt(EltParams& params)
             whiteKey(
                 params.ctx,
                 getWhiteKeyRect(coord, k++),
-                _onClick,
+                onClick_,
                 note
             );
         }
@@ -88,20 +95,20 @@ void whiteKey(
 ) {
     EltParams p(ctx);
     p.rect = rect;
-    p.color = white;
+    p.color = inactiveColor;
 
     if (
         ctx.sequencer->mode == Select
         && ctx.sequencer->getSelectedCell().on
         && ctx.sequencer->getSelectedCell().synthSettings["note"] == note
     ) {
-        p.displayColor = blue;
+        p.displayColor = activeColor;
     }
     else {
-        p.displayColor = white;
+        p.displayColor = inactiveColor;
     }
 
-    p.onClickColor = blue;
+    p.onClickColor = activeColor;
     p.onClick = onClick;
     p.onHold = [&]() { p.displayColor = p.onClickColor; };
     rectButtonElt(p);
@@ -122,13 +129,13 @@ void blackKey(
         && ctx.sequencer->getSelectedCell().on
         && ctx.sequencer->getSelectedCell().synthSettings["note"] == note
     ) {
-        p.displayColor = blue;
+        p.displayColor = activeColor;
     }
     else {
         p.displayColor = black;
     }
 
-    p.onClickColor = blue;
+    p.onClickColor = activeColor;
     p.onClick = onClick;
     p.onHold = [&]() { p.displayColor = p.onClickColor; };
     rectButtonElt(p);
@@ -184,4 +191,49 @@ void background(EltParams& params, Coord coord)
     };
 
     params.ctx.graphicsWrapper.drawRect(rect);
+}
+
+void octaveControl(EltParams& params, Coord coord)
+{
+    auto& sequencer = params.ctx.sequencer;
+
+    int yPadding = 25;
+    {
+        EltParams textParams(params.ctx);
+        textParams.coord = coord;
+        textParams.label = "current octave: " + std::to_string(sequencer->octave);
+        textElt(textParams);
+    }
+    coord.y += yPadding;
+    {
+        EltParams textParams(params.ctx);
+        textParams.coord = coord;
+        textParams.label = "octave up";
+        textElt(textParams);
+
+        EltParams p(params.ctx);
+        p.rect = Rect(coord.x + 100, coord.y, 20, 20);
+        p.displayColor = inactiveColor;
+        p.onClick = [&]() {
+            sequencer->octave = clamp(sequencer->octave + 1, 0, sequencer->numOctaves);
+        };
+        p.onHold = [&]() { p.displayColor = activeColor; };
+        rectButtonElt(p);
+    }
+    coord.y += yPadding;
+    {
+        EltParams textParams(params.ctx);
+        textParams.coord = Coord(coord.x, coord.y);
+        textParams.label = "octave down";
+        textElt(textParams);
+
+        EltParams p(params.ctx);
+        p.rect = Rect(coord.x + 100, coord.y, 20, 20);
+        p.displayColor = inactiveColor;
+        p.onClick = [&]() {
+            sequencer->octave = clamp(sequencer->octave - 1, 0, sequencer->numOctaves);
+        };
+        p.onHold = [&]() { p.displayColor = activeColor; };
+        rectButtonElt(p);
+    }
 }

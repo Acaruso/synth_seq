@@ -1,6 +1,8 @@
 #include "audio_system.hpp"
 
+#include <cstdio>
 #include <iostream>
+#include <stdint.h>
 #include <string>
 
 #include "src/audio/audio_util.hpp"
@@ -15,7 +17,7 @@ AudioSystem::AudioSystem(
     wasapiWrapper = {};
     init(wasapiWrapper);
 
-    unsigned long samplesPerSecond = wasapiWrapper.waveFormat.Format.nSamplesPerSec;
+    unsigned samplesPerSecond = wasapiWrapper.waveFormat.Format.nSamplesPerSec;
     secondsPerSample = 1.0 / (double)samplesPerSecond;
 
     bufferSizeBytes = wasapiWrapper.getBufferSizeBytes();
@@ -28,7 +30,10 @@ AudioSystem::AudioSystem(
     sliceTime = periodSizeFrames * 4;
     leadTime = sliceTime * 2;
 
-    synthSettings = getDefaultSynthSettings();
+    trigs = std::vector<bool>(numTracks, false);
+    vSynthSettings = std::vector<SynthSettings>(numTracks, makeSynthSettings());
+
+    initUgens();
 }
 
 void AudioSystem::playAudio()
@@ -41,19 +46,12 @@ void AudioSystem::playAudio()
 
     // main loop:
     while (!quit) {
-        WaitForSingleObject(wasapiWrapper.hEvent, INFINITE);
+        wasapiWrapper.waitForSignal();
 
         handleMessagesFromMainThread();
 
-        unsigned numPaddingFrames = wasapiWrapper.getCurrentPadding();
-
-        // recall that each elt of buffer stores 1 sample
-        // frame is 2 samples -> 1 for each channel
-        // so numSamplesToWrite = (2 * numFramesToWrite)
-
-        unsigned numFramesToWrite = bufferSizeFrames - numPaddingFrames;
-
-        unsigned numSamplesToWrite = numFramesToWrite * 2;
+        unsigned numSamplesToWrite = wasapiWrapper.getNumSamplesToWrite();
+        unsigned numFramesToWrite = wasapiWrapper.getNumFramesToWrite();
 
         fillSampleBuffer(numSamplesToWrite);
 
@@ -80,10 +78,6 @@ void AudioSystem::handleMessagesFromMainThread()
         }
         else if (std::get_if<StopMessage>(&message)) {
             playing = false;
-        }
-        else if (NoteMessage* p = std::get_if<NoteMessage>(&message)) {
-            freq = mtof(p->note);
-            trig = true;
         }
         else if (SynthSettingsMessage* p = std::get_if<SynthSettingsMessage>(&message)) {
             synthSettings = p->synthSettings;
@@ -114,7 +108,7 @@ void AudioSystem::fillSampleBuffer(size_t numSamplesToWrite)
 
         double sig = audioCallback();
 
-        unsigned samp = scaleSignal(sig);
+        uint32_t samp = scaleSignal(sig);
 
         sampleBuffer.buffer[i] = samp;       // L
         sampleBuffer.buffer[i + 1] = samp;   // R
@@ -140,17 +134,30 @@ void AudioSystem::fillSampleBuffer(size_t numSamplesToWrite)
 
 void AudioSystem::setTrigs()
 {
-    // check if presentTransport is in eventMap
-    if (eventMap.find(presentTransport) != eventMap.end()) {
-        trig = true;
-        synthSettings = eventMap[presentTransport];
-        eventMap.erase(presentTransport);
+    if (futureTransport >= leadTime) {
+        std::string key;
+
+        for (int trackIdx = 0; trackIdx < numTracks; trackIdx++) {
+            key = makeEventKey(presentTransport, trackIdx);
+
+            if (eventMap.find(key) != eventMap.end()) {
+                trigs[trackIdx] = true;
+                vSynthSettings[trackIdx] = eventMap[key].synthSettings;
+                eventMap.erase(key);
+            }
+        }
     }
 }
 
 void AudioSystem::unsetTrigs()
 {
     trig = false;
+    trigs.assign(trigs.size(), false);
+}
+
+double AudioSystem::getTime()
+{
+    return double(sampleCounter) * secondsPerSample;
 }
 
 AudioSystem::~AudioSystem()

@@ -9,7 +9,7 @@ void InputSystem::run()
     while (SDL_PollEvent(&event) != 0) {
         switch (event.type) {
         case SDL_QUIT:
-            this->uiState.quit = true;
+            uiState.quit = true;
             break;
         case SDL_MOUSEBUTTONDOWN:
             mouse_button_down(event);
@@ -22,9 +22,11 @@ void InputSystem::run()
             break;
         case SDL_KEYDOWN:
             keydown(event);
+            // std::cout << uiState.c << std::endl;
             break;
         case SDL_KEYUP:
             keyup(event);
+            // std::cout << uiState.c << std::endl;
             break;
         }
     }
@@ -32,153 +34,153 @@ void InputSystem::run()
 
 void InputSystem::mouse_button_down(SDL_Event& event)
 {
-    this->uiState.click = true;
+    uiState.click = true;
 }
 
 void InputSystem::mouse_button_up(SDL_Event& event)
 {
-    this->uiState.click = false;
-    this->uiState.curEltId = 0;
+    uiState.click = false;
+    uiState.curEltId = 0;
 }
 
 void InputSystem::mouse_motion(SDL_Event& event)
 {
-    this->uiState.mousePos.x = event.motion.x;
-    this->uiState.mousePos.y = event.motion.y;
+    uiState.mousePos.x = event.motion.x;
+    uiState.mousePos.y = event.motion.y;
 }
 
 void InputSystem::keydown(SDL_Event& event)
 {
-    this->uiState.keydown_event = true;
+    uiState.keydown_event = true;
 
     switch (event.key.keysym.sym) {
     case SDLK_a:
-        this->uiState.a = true;
+        uiState.a = true;
         break;
     case SDLK_b:
-        this->uiState.b = true;
+        uiState.b = true;
         break;
     case SDLK_c:
-        this->uiState.c = true;
+        uiState.c = true;
         break;
     case SDLK_d:
-        this->uiState.d = true;
+        uiState.d = true;
         break;
     case SDLK_e:
-        this->uiState.e = true;
+        uiState.e = true;
         break;
     case SDLK_f:
-        this->uiState.f = true;
+        uiState.f = true;
         break;
     case SDLK_g:
-        this->uiState.g = true;
+        uiState.g = true;
         break;
     case SDLK_h:
-        this->uiState.h = true;
+        uiState.h = true;
         break;
     case SDLK_i:
-        this->uiState.i = true;
+        uiState.i = true;
         break;
     case SDLK_j:
-        this->uiState.j = true;
+        uiState.j = true;
         break;
     case SDLK_k:
-        this->uiState.k = true;
+        uiState.k = true;
         break;
     case SDLK_l:
-        this->uiState.l = true;
+        uiState.l = true;
         break;
     case SDLK_m:
-        this->uiState.m = true;
+        uiState.m = true;
         break;
     case SDLK_n:
-        this->uiState.n = true;
+        uiState.n = true;
         break;
     case SDLK_o:
-        this->uiState.o = true;
+        uiState.o = true;
         break;
     case SDLK_p:
-        this->uiState.p = true;
+        uiState.p = true;
         break;
     case SDLK_q:
-        this->uiState.q = true;
+        uiState.q = true;
         break;
     case SDLK_r:
-        this->uiState.r = true;
+        uiState.r = true;
         break;
     case SDLK_s:
-        this->uiState.s = true;
+        uiState.s = true;
         break;
     case SDLK_t:
-        this->uiState.t = true;
+        uiState.t = true;
         break;
     case SDLK_u:
-        this->uiState.u = true;
+        uiState.u = true;
         break;
     case SDLK_v:
-        this->uiState.v = true;
+        uiState.v = true;
         break;
     case SDLK_w:
-        this->uiState.w = true;
+        uiState.w = true;
         break;
     case SDLK_x:
-        this->uiState.x = true;
+        uiState.x = true;
         break;
     case SDLK_y:
-        this->uiState.y = true;
+        uiState.y = true;
         break;
     case SDLK_z:
-        this->uiState.z = true;
+        uiState.z = true;
         break;
 
     case SDLK_UP:
-        this->uiState.up = true;
+        uiState.up = true;
         break;
     case SDLK_DOWN:
-        this->uiState.down = true;
+        uiState.down = true;
         break;
     case SDLK_LEFT:
-        this->uiState.left = true;
+        uiState.left = true;
         break;
     case SDLK_RIGHT:
-        this->uiState.right = true;
+        uiState.right = true;
         break;
 
     case SDLK_SPACE:
-        this->uiState.space = true;
+        uiState.space = true;
         break;
     case SDLK_LSHIFT:
-        this->uiState.lshift = true;
+        uiState.lshift = true;
         break;
     case SDLK_LCTRL:
-        this->uiState.lctrl = true;
+        uiState.lctrl = true;
         break;
     case SDLK_LALT:
-        this->uiState.lalt = true;
+        uiState.lalt = true;
         break;
     case SDLK_TAB:
-        this->uiState.tab = true;
+        uiState.tab = true;
         break;
     case SDLK_1:
-        this->uiState.i1 = true;
+        uiState.i1 = true;
         break;
     case SDLK_2:
-        this->uiState.i2 = true;
+        uiState.i2 = true;
         break;
     case SDLK_3:
-        this->uiState.i3 = true;
+        uiState.i3 = true;
         break;
     case SDLK_4:
-        this->uiState.i4 = true;
+        uiState.i4 = true;
         break;
     case SDLK_5:
-        this->uiState.i5 = true;
+        uiState.i5 = true;
         break;
     case SDLK_6:
-        this->uiState.i6 = true;
+        uiState.i6 = true;
         break;
     case SDLK_ESCAPE:
-        this->uiState.esc = true;
+        uiState.esc = true;
         break;
     }
 }
@@ -187,137 +189,138 @@ void InputSystem::keyup(SDL_Event& event)
 {
     switch (event.key.keysym.sym) {
     case SDLK_a:
-        this->uiState.a = false;
+        uiState.a = false;
         break;
     case SDLK_b:
-        this->uiState.b = false;
+        uiState.b = false;
         break;
     case SDLK_c:
-        this->uiState.c = false;
+        uiState.c = false;
         break;
     case SDLK_d:
-        this->uiState.d = false;
+        uiState.d = false;
         break;
     case SDLK_e:
-        this->uiState.e = false;
+        uiState.e = false;
         break;
     case SDLK_f:
-        this->uiState.f = false;
+        uiState.f = false;
         break;
     case SDLK_g:
-        this->uiState.g = false;
+        uiState.g = false;
         break;
     case SDLK_h:
-        this->uiState.h = false;
+        uiState.h = false;
         break;
     case SDLK_i:
-        this->uiState.i = false;
+        uiState.i = false;
         break;
     case SDLK_j:
-        this->uiState.j = false;
+        uiState.j = false;
         break;
     case SDLK_k:
-        this->uiState.k = false;
+        uiState.k = false;
         break;
     case SDLK_l:
-        this->uiState.l = false;
+        uiState.l = false;
         break;
     case SDLK_m:
-        this->uiState.m = false;
+        uiState.m = false;
         break;
     case SDLK_n:
-        this->uiState.n = false;
+        uiState.n = false;
         break;
     case SDLK_o:
-        this->uiState.o = false;
+        uiState.o = false;
         break;
     case SDLK_p:
-        this->uiState.p = false;
+        uiState.p = false;
         break;
     case SDLK_q:
-        this->uiState.q = false;
+        uiState.q = false;
         break;
     case SDLK_r:
-        this->uiState.r = false;
+        uiState.r = false;
         break;
     case SDLK_s:
-        this->uiState.s = false;
+        uiState.s = false;
         break;
     case SDLK_t:
-        this->uiState.t = false;
+        uiState.t = false;
         break;
     case SDLK_u:
-        this->uiState.u = false;
+        uiState.u = false;
         break;
     case SDLK_v:
-        this->uiState.v = false;
+        uiState.v = false;
         break;
     case SDLK_w:
-        this->uiState.w = false;
+        uiState.w = false;
         break;
     case SDLK_x:
-        this->uiState.x = false;
+        uiState.x = false;
         break;
     case SDLK_y:
-        this->uiState.y = false;
+        uiState.y = false;
         break;
     case SDLK_z:
-        this->uiState.z = false;
+        uiState.z = false;
         break;
 
     case SDLK_UP:
-        this->uiState.up = false;
+        uiState.up = false;
         break;
     case SDLK_DOWN:
-        this->uiState.down = false;
+        uiState.down = false;
         break;
     case SDLK_LEFT:
-        this->uiState.left = false;
+        uiState.left = false;
         break;
     case SDLK_RIGHT:
-        this->uiState.right = false;
+        uiState.right = false;
         break;
 
     case SDLK_SPACE:
-        this->uiState.space = false;
+        uiState.space = false;
         break;
     case SDLK_LSHIFT:
-        this->uiState.lshift = false;
+        uiState.lshift = false;
         break;
     case SDLK_LCTRL:
-        this->uiState.lctrl = false;
+        uiState.lctrl = false;
         break;
     case SDLK_LALT:
-        this->uiState.lalt = false;
+        uiState.lalt = false;
         break;
     case SDLK_TAB:
-        this->uiState.tab = false;
+        uiState.tab = false;
         break;
     case SDLK_1:
-        this->uiState.i1 = false;
+        uiState.i1 = false;
         break;
     case SDLK_2:
-        this->uiState.i2 = false;
+        uiState.i2 = false;
         break;
     case SDLK_3:
-        this->uiState.i3 = false;
+        uiState.i3 = false;
         break;
     case SDLK_4:
-        this->uiState.i4 = false;
+        uiState.i4 = false;
         break;
     case SDLK_5:
-        this->uiState.i5 = false;
+        uiState.i5 = false;
         break;
     case SDLK_6:
-        this->uiState.i6 = false;
+        uiState.i6 = false;
         break;
     case SDLK_ESCAPE:
-        this->uiState.esc = false;
+        uiState.esc = false;
         break;
     }
 }
 
 void InputSystem::nextState()
 {
-    this->prevUiState = this->uiState;
+    prevUiState = uiState;
+    // uiState = UiState();
 }

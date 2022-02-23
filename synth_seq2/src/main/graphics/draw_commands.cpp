@@ -1,52 +1,48 @@
 #include "draw_commands.hpp"
 
+void setRenderDrawColor(SDL_Renderer* renderer, Color c)
+{
+    SDL_SetRenderDrawColor(renderer, c.r, c.g, c.b, c.a);
+}
+
+SDL_Rect makeSdlRect(Rect rect)
+{
+    return SDL_Rect{rect.x, rect.y, rect.w, rect.h};
+}
+
+SDL_Rect makeSdlRect(int x, int y, int w, int h)
+{
+    return SDL_Rect{x, y, w, h};
+}
+
 DrawRectCommand::DrawRectCommand(Rect rect) : rect(rect) {}
 
 void DrawRectCommand::draw(SDL_Renderer* renderer)
 {
-    SDL_Rect sdl_rect;
-    sdl_rect.x = this->rect.x;
-    sdl_rect.y = this->rect.y;
-    sdl_rect.w = this->rect.w;
-    sdl_rect.h = this->rect.h;
-
-    SDL_SetRenderDrawColor(
-        renderer,
-        this->rect.color.r,
-        this->rect.color.g,
-        this->rect.color.b,
-        this->rect.color.a
-    );
-
+    SDL_Rect sdl_rect = makeSdlRect(rect);
+    setRenderDrawColor(renderer, rect.color);
     SDL_RenderFillRect(renderer, &sdl_rect);
 }
 
 int DrawRectCommand::getZAxis()
 {
-    return this->rect.z;
+    return rect.z;
 }
 
 DrawImageCommand::DrawImageCommand(Image image, Coord coord) : image(image), coord(coord) {}
 
 void DrawImageCommand::draw(SDL_Renderer* renderer)
 {
-    SDL_Rect sdlRect;
-    sdlRect.x = this->coord.x;
-    sdlRect.y = this->coord.y;
-    sdlRect.w = this->image.w;
-    sdlRect.h = this->image.h;
-
-    SDL_RenderCopy(renderer, this->image.p_texture, NULL, &sdlRect);
+    SDL_Rect sdlRect = makeSdlRect(coord.x, coord.y, image.w, image.h);
+    SDL_RenderCopy(renderer, image.p_texture, NULL, &sdlRect);
 }
 
 int DrawImageCommand::getZAxis()
 {
-    return this->coord.z;
+    return coord.z;
 }
 
-DrawTextCommand::DrawTextCommand(std::string text, Font font, Coord coord)
-    : text(text), font(font), coord(coord)
-{}
+DrawTextCommand::DrawTextCommand(std::string t, Font f, Coord c) : text(t), font(f), coord(c) {}
 
 void DrawTextCommand::draw(SDL_Renderer* renderer)
 {
@@ -55,19 +51,18 @@ void DrawTextCommand::draw(SDL_Renderer* renderer)
 
 int DrawTextCommand::getZAxis()
 {
-    return this->coord.z;
+    return coord.z;
 }
 
-DrawLineCommand::DrawLineCommand(Coord start, Coord end)
-    : start(start), end(end)
-{}
+DrawLineCommand::DrawLineCommand(Coord s, Coord e) : start(s), end(e) {}
 
 void DrawLineCommand::draw(SDL_Renderer* renderer)
 {
+    setRenderDrawColor(renderer, color);
     SDL_RenderDrawLine(renderer, start.x, start.y, end.x, end.y);
 }
 
 int DrawLineCommand::getZAxis()
 {
-    return this->start.z;
+    return start.z;
 }

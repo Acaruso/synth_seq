@@ -1,10 +1,12 @@
 #pragma once
 
 #include <functional>
+#include <vector>
 
 #include "lib/readerwriterqueue.h"
 
 #include "src/audio/audio_system/sample_buffer.hpp"
+#include "src/audio/synthesis/ugens/poly_fm_sin.hpp"
 #include "src/audio/wasapi_wrapper/wasapi_wrapper.hpp"
 #include "src/shared/messages.hpp"
 #include "src/shared/shared.hpp"
@@ -30,15 +32,12 @@ private:
     unsigned bufferSizeFrames;
     unsigned periodSizeFrames;
 
-    // from context /////////////////////////////
-
-    unsigned long sampleCounter{0};
-    unsigned long transport{0};
+    unsigned sampleCounter{0};
 
     unsigned sliceTime{0};
     unsigned leadTime{0};
-    unsigned long presentTransport{0};
-    unsigned long futureTransport{0};
+    unsigned presentTransport{0};
+    unsigned futureTransport{0};
 
     bool playing{false};
 
@@ -46,22 +45,25 @@ private:
 
     bool trig{false};
     SynthSettings synthSettings;
+
     EventMap eventMap;
 
-    double freq{0.0};
+    int numTracks{6};
+    std::vector<bool> trigs;
+    std::vector<SynthSettings> vSynthSettings;
+
     bool quit{false};
 
-    double getTime()
-    {
-        return double(sampleCounter) * secondsPerSample;
-    }
+    PolyFmSin polyFmSin;
+    std::vector<PolyFmSin> sins;
 
-    /////////////////////////////////////////////
-
+    void initUgens();
     double audioCallback();
+
     void handleMessagesFromMainThread();
     void sendMessagesToMainThread();
     void setTrigs();
     void unsetTrigs();
+    double getTime();
     void fillSampleBuffer(size_t numSamplesToWrite);
 };

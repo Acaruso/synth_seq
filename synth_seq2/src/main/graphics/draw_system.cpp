@@ -4,6 +4,10 @@
 #include <functional>
 #include <iostream>
 
+DrawSystem::DrawSystem() {}
+
+DrawSystem::DrawSystem(SDL_Renderer* renderer) : renderer(renderer) {}
+
 void DrawSystem::push(DrawCommand command)
 {
     drawQueue.push_back(command);
@@ -12,7 +16,7 @@ void DrawSystem::push(DrawCommand command)
 auto v_getZAxis = [](auto& x) { return x.getZAxis(); };
 
 // larger z_axis means it's on top
-void DrawSystem::draw(SDL_Renderer* renderer)
+void DrawSystem::draw()
 {
     std::sort(
         std::begin(drawQueue),

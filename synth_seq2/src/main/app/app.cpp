@@ -8,11 +8,8 @@
 
 #include "src/audio/audio_entrypoint.hpp"
 
-App::App(
-    std::function<void(AppContext& context)> setup,
-    std::function<void(AppContext& context)> callback
-)
-    : setup(setup), callback(callback)
+App::App()
+    : uiSystem(context)
 {
     toAudioQueue = MessageQueue(16);
     toMainQueue = MessageQueue(16);
@@ -20,6 +17,28 @@ App::App(
     context.toAudioQueue = &toAudioQueue;
     context.toMainQueue = &toMainQueue;
     context.sequencer = &sequencer;
+
+    try {
+        context.graphicsWrapper.loadFont(
+            "dos",
+            "fonts/Perfect-DOS-VGA-437.ttf",
+            16,
+            9,
+            20
+        );
+
+        context.graphicsWrapper.loadFont(
+            "inconsolata",
+            "fonts/Inconsolata-Regular.ttf",
+            16,
+            8,
+            20
+        );
+    }
+    catch(std::exception& ex) {
+        std::cout << ex.what() << std::endl;
+        throw ex;
+    }
 }
 
 void App::run()
@@ -30,17 +49,16 @@ void App::run()
         &toMainQueue
     );
 
-    setup(context);
-
     while (!context.inputSystem.uiState.quit) {
         std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+        context.inputSystem.run();
+        uiSystem.handleUiEvents();
 
         handleMessagesFromAudioThread();
 
         context.graphicsWrapper.clearWindow();
-        context.inputSystem.run();
 
-        callback(context);
+        uiSystem.draw();
 
         sendMessagesToAudioThread();
 
@@ -83,7 +101,6 @@ void App::sendMessagesToAudioThread()
     if (getEventMap) {
         EventMap eventMap = sequencer.getEventMap();
         EventMapMessage message(eventMap);
-
         toAudioQueue.enqueue(message);
     }
 }

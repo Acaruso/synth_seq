@@ -13,12 +13,13 @@ bool isCoordInsideRect(Coord coord, Rect rect)
     );
 }
 
+// clamp x between min inclusive and max exclusive
 int clamp(int x, int min, int max)
 {
     if (x < min) {
         return min;
-    } else if ( x > max) {
-        return max;
+    } else if ( x >= max) {
+        return max - 1;
     } else {
         return x;
     }

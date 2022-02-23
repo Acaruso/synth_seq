@@ -10,6 +10,7 @@
 #include "src/main/graphics/draw_system.hpp"
 #include "src/main/graphics/font.hpp"
 #include "src/main/graphics/image.hpp"
+#include "src/main/graphics/color.hpp"
 #include "src/main/graphics/coord.hpp"
 #include "src/main/graphics/rect.hpp"
 
@@ -43,9 +44,11 @@ public:
     void quit();
 
 private:
-    std::string windowTitle;
-    int screenWidth;
-    int screenHeight;
+    std::string windowTitle{"Seq"};
+    int screenWidth{1300};
+    int screenHeight{900};
+    Color bgColor{offWhite};
+    Color textColor{black};
     SDL_Window* window;
     SDL_Surface* windowSurface;
     SDL_Renderer* windowRenderer;

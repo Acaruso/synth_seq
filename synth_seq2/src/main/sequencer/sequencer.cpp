@@ -2,112 +2,193 @@
 
 #include <iostream>
 
+#include "src/main/util.hpp"
+
 Sequencer::Sequencer()
 {
-    curSynthSettings = getDefaultSynthSettings();
-
-    int size = 16;
-    for (int i = 0; i < size; i++) {
-        row.push_back(Cell());
-    }
+    tracks.push_back(Track());
+    setBpm(120);
 }
 
-Sequencer::Sequencer(int size)
+bool Sequencer::isPlaying()
 {
-    curSynthSettings = getDefaultSynthSettings();
-
-    for (int i = 0; i < size; i++) {
-        row.push_back(Cell());
-    }
+    return playing;
 }
 
-Cell& Sequencer::getCell(int i)
+void Sequencer::play()
 {
-    return row[i];
+    playing = true;
+}
+
+void Sequencer::stop()
+{
+    playing = false;
+    curStep = 0;
+    transport = 0;
+    prevTransport = 0;
+    curPulse = 0;
+}
+
+SequencerMode Sequencer::getMode()
+{
+    return mode;
+}
+
+void Sequencer::setMode(SequencerMode mode_)
+{
+    mode = mode_;
+}
+
+Track& Sequencer::getSelectedTrack()
+{
+    return tracks[selected.row];
+}
+
+Cell& Sequencer::getCell(int row, int col)
+{
+    return tracks[row].cells[col];
+}
+
+void Sequencer::setCell(int row, int col, Cell cell)
+{
+    tracks[row].cells[col] = cell;
 }
 
 Cell& Sequencer::getSelectedCell()
 {
-    return row[selected];
+    return tracks[selected.row].cells[selected.col];
+}
+
+Cell Sequencer::getSelectedCellCopy()
+{
+    return tracks[selected.row].cells[selected.col];
+}
+
+Selected Sequencer::getSelected()
+{
+    return selected;
+}
+
+void Sequencer::moveSelected(Direction direction)
+{
+    if (direction == Up) {
+        selected.row = clamp(selected.row - 1, 0, tracks.size());
+    }
+    else if (direction == Down) {
+        selected.row = clamp(selected.row + 1, 0, tracks.size());
+    }
+    else if (direction == Left) {
+        selected.col = clamp(selected.col - 1, 0, numSteps);
+    }
+    else if (direction == Right) {
+        selected.col = clamp(selected.col + 1, 0, numSteps);
+    }
 }
 
 SynthSettings& Sequencer::getSynthSettings()
 {
+    Track& track = getSelectedTrack();
+    Cell& cell = getSelectedCell();
+
     if (mode == Normal) {
-        return curSynthSettings;
+        return track.getSynthSettings();
     }
     else {
-        auto& cell = getSelectedCell();
         if (cell.on) {
-            return cell.synthSettings;
+            return cell.getSynthSettings();
         }
         else {
-            return curSynthSettings;
+            return track.getSynthSettings();
         }
     }
 }
 
-void Sequencer::toggleCell(int i)
+void Sequencer::toggleCell(int row, int col)
 {
     mode = Select;
+    selected = { row, col };
 
-    Cell& cell = getCell(i);
+    Cell& cell = getSelectedCell();
+    Track& track = getSelectedTrack();
 
     if (!cell.on) {
         cell.on = true;
-        cell.synthSettings = curSynthSettings;
+        cell.synthSettings = track.getSynthSettings();
     }
     else {
         cell.on = false;
     }
-    selected = i;
 }
 
-void Sequencer::selectCell(int i)
+void Sequencer::selectCell(int row, int col)
 {
-    if (selected == i && mode == Select) {
+    if (
+        selected.row == row
+        && selected.col == col
+        && mode == Select
+    ) {
         mode = Normal;
     }
     else {
         mode = Select;
-        selected = i;
+        selected.row = row;
+        selected.col = col;
     }
+}
+
+void Sequencer::addTrack()
+{
+    tracks.push_back(Track());
+}
+
+int Sequencer::getBpm()
+{
+    return bpm;
+}
+
+void Sequencer::setBpm(int newBpm)
+{
+    bpm = newBpm;
+    double temp = (double)sampleRate / ((double)bpm / (double)60 * (double)pulsesPerQuarterNote);
+    samplesPerPulse = temp;
 }
 
 void Sequencer::updateTransport(unsigned newTransport)
 {
     prevTransport = transport;
     transport = newTransport;
-    step = getStep(transport);
-}
-
-int Sequencer::getStep(int transport)
-{
-    int t = transport / samplesPerStep;
-    t = t % 16;
-    return t;
 }
 
 EventMap Sequencer::getEventMap()
 {
-    EventMap map;
-
-    unsigned sample = 0;
+    EventMap eventMap;
+    unsigned curSample = 0;
 
     if (prevTransport == 0) {
-        sample = 0;
+        curSample = 0;
     }
     else {
-        sample = prevTransport + (samplesPerStep - (prevTransport % samplesPerStep));
+        curSample = prevTransport + (samplesPerPulse - (prevTransport % samplesPerPulse));
     }
 
-    for (; sample < transport; sample += samplesPerStep) {
-        int step = getStep(sample);
+    for (; curSample < transport; curSample += samplesPerPulse) {
+        curStep = curPulse / pulsesPer16thNote;
 
-        if (row[step].on) {
-            map[sample] = row[step].synthSettings;
+        if (curPulse % pulsesPer16thNote == 0) {
+            for (int i = 0; i < tracks.size(); i++) {
+                Track& track = tracks[i];
+                Cell& cell = track.cells[curStep];
+
+                if (cell.on) {
+                    Event event(curSample, i, cell.synthSettings);
+                    std::string key = makeEventKey(event.sample, event.track);
+                    eventMap[key] = event;
+                }
+            }
         }
+
+        curPulse = (curPulse + 1) % (pulsesPer16thNote * numSteps);
     }
 
-    return map;
+    return eventMap;
 }

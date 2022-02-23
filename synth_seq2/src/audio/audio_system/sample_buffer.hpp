@@ -1,23 +1,24 @@
 #pragma once
 
+#include <cstring>
+#include <stdint.h>
+
 class SampleBuffer
 {
 public:
-    unsigned long* buffer;
+    uint32_t* buffer;
     unsigned numSamples;
 
     SampleBuffer() {}
 
     SampleBuffer(unsigned bufferSizeBytes) {
-        this->numSamples = bufferSizeBytes / sizeof(unsigned long);
-        this->buffer = new unsigned long[this->numSamples];
+        numSamples = bufferSizeBytes / sizeof(uint32_t);
+        buffer = new uint32_t[numSamples];
     }
 
     void zero()
     {
-        for (unsigned i = 0; i < this->numSamples; i++) {
-            this->buffer[i] = 0;
-        }
+        memset(buffer, 0, numSamples * sizeof(uint32_t));
     }
 
     void cleanUp()

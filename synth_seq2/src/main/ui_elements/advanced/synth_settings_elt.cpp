@@ -90,19 +90,19 @@ void _numberElt(AppContext& context, std::string label, Coord coord, std::string
     p.coord = coord;
 
     auto& synthSettings = context.sequencer->getSynthSettings();
+
     int& data = synthSettings[key];
 
     p.min = 0;
-    p.max = 100;
+    p.max = 101;
 
     int maxNumDigits = (int)std::to_string(p.max).size();
 
-    p.getDisplayText = [&]() {
-        return pad(maxNumDigits, std::to_string(data));
-    };
+    p.displayText = pad(maxNumDigits, std::to_string(data));
 
     p.onDrag = [&]() {
-        data += context.getDragAmount() / 2;
+        int drag = context.getDragAmount();
+        data = (drag == 1 || drag == -1) ? data + drag : data + (drag / 2);
         data = clamp(data, p.min, p.max);
     };
 

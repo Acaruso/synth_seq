@@ -41,6 +41,7 @@ struct DrawLineCommand
 {
     Coord start;
     Coord end;
+    Color color{black};
     DrawLineCommand(Coord start, Coord end);
     void draw(SDL_Renderer* renderer);
     int getZAxis();

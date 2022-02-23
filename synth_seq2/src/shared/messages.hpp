@@ -5,7 +5,6 @@
 
 #include "lib/readerwriterqueue.h"
 
-#include "src/main/sequencer/sequencer.hpp"
 #include "src/shared/shared.hpp"
 
 struct QuitMessage {};
@@ -13,13 +12,6 @@ struct QuitMessage {};
 struct PlayMessage {};
 
 struct StopMessage {};
-
-struct NoteMessage
-{
-    int note{0};
-    NoteMessage() {}
-    NoteMessage(int note) : note(note) {}
-};
 
 struct IntMessage
 {
@@ -67,7 +59,6 @@ using Message = std::variant<
     QuitMessage,
     PlayMessage,
     StopMessage,
-    NoteMessage,
     IntMessage,
     BoolMessage,
     DoubleMessage,
